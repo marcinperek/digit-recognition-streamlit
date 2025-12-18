@@ -11,9 +11,11 @@ st.title("Digit Recognizer")
 
 @st.cache_resource
 def load_model(path):
-    model_data = torch.load(path)
+    device = torch.device('cpu')  # Ensure CPU is used
+    model_data = torch.load(path, map_location=device)  # Load model on CPU
     model = DigitRecognizer()
     model.load_state_dict(model_data['model_state_dict'])
+    model.to(device)  # Move model to CPU
     model.eval()
     return model
 
@@ -35,7 +37,7 @@ if uploaded_image is not None:
     model = load_model("models/best_20251218_173936.pth")
 
     with torch.no_grad():
-        input_tensor = torch.tensor(image_array, dtype=torch.float32).unsqueeze(0)
+        input_tensor = torch.tensor(image_array, dtype=torch.float32).unsqueeze(0).to('cpu')  # Ensure tensor is on CPU
         output = model(input_tensor)
         predicted_class = torch.argmax(output, dim=1).item()
 
