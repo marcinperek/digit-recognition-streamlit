@@ -28,3 +28,11 @@ def validate(model, test_loader, loss_fn, config):
             correct += (predicted == batch_y).sum().item()
     accuracy = correct / len(test_loader.dataset)
     return total_loss / len(test_loader), accuracy
+
+def predict(model, input_tensor, config):
+    model.eval()
+    input_tensor = input_tensor.to(config["train"]["device"])
+    with torch.no_grad():
+        outputs = model(input_tensor)
+        _, predicted = torch.max(outputs.data, 1)
+    return predicted.cpu().numpy()
